@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_update"
+            android:icon="@drawable/ic_autorenew_black_24dp"
+            android:title="Update" />
+        <item
+            android:id="@+id/nav_view"
+            android:icon="@drawable/ic_hourglass_empty_black_24dp"
+            android:title="View" />
+        <item
+            android:id="@+id/nav_new"
+            android:icon="@drawable/ic_hourglass_empty_black_24dp"
+            android:title="New" />
+        <item
+            android:id="@+id/nav_indi_progress"
+            android:icon="@drawable/ic_hourglass_empty_black_24dp"
+            android:title="Individual Progress" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_hourglass_empty_black_24dp"
+            android:title="Logout" />
+    </group>
+
+</menu>

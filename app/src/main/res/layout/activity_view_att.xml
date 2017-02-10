@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.fathima.tomton.ViewAtt">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lineartop"
+        android:layout_alignParentStart="true">
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_subject"
+            android:background="@color/colorPrimary"
+            android:layout_weight="1"
+            android:minHeight="30dp"
+            android:layout_gravity="center_vertical" />
+        <RadioGroup
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/radiogroup"
+            android:layout_weight="1"
+            android:paddingStart="10dp">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Division A"
+                android:id="@+id/radioButton"
+                android:checked="true"
+                android:layout_gravity="top|start"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Division B"
+                android:id="@+id/radioButton2"
+                android:checked="false"
+                android:layout_weight="1" />
+
+        </RadioGroup>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lineartop"
+        android:id="@+id/linearsort">
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/sort_spinner" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="View"
+            android:id="@+id/view_btn"
+            android:minWidth="100dp"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
+            android:background="@color/secondary3"
+            android:textColor="@color/secondary1"
+            android:textStyle="normal|bold"
+            android:textSize="16sp" />
+    </LinearLayout>
+    <TableLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearsort"
+        android:id="@+id/linear"
+        android:layout_marginTop="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/rowtwo">
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Roll No"
+                android:id="@+id/roll"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textColor="@color/secondary1"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                android:id="@+id/name"
+                android:layout_weight="2"
+                android:textAlignment="center"
+                android:textColor="@color/secondary1"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hour"
+                android:id="@+id/stat"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textColor="@color/secondary1"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Percent"
+                android:id="@+id/textView8"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textColor="@color/secondary1"
+                android:textStyle="bold" />
+        </TableRow>
+    </TableLayout>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView2"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/linear" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentStart="false"
+        android:id="@+id/tv_error"
+        android:layout_below="@+id/linearsort"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:textColor="@color/red" />
+
+</RelativeLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="10"
+        android:id="@+id/email"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="#fff"
+        android:hint="E-Mail"
+        android:textColor="@color/secondary2"
+        android:textColorHint="@color/secondary2"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignStart="@+id/Username"
+        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="false"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:text="RESET PASSWORD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/reset"
+        android:textColor="@color/secondary2"
+        android:layout_marginTop="46dp"
+        android:layout_gravity="center_vertical"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="24sp"
+        android:textStyle="normal|bold" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/Username"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="#fff"
+        android:hint="Username"
+        android:textColor="@color/secondary2"
+        android:textColorHint="@color/secondary2"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="20dp"
+        android:layout_above="@+id/email"
+        android:layout_centerHorizontal="false" />
+
+    <Button
+        android:text="CONFIRM"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/email"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="58dp"
+        android:id="@+id/confirm"
+        android:background="@color/secondary3"
+        android:textColor="@color/secondary1"
+        android:textSize="23sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

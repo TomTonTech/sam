@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentEnd="true"
+    android:background="@color/green"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Roll No"
+                android:id="@+id/attendance_roll"
+                android:textAlignment="center"
+                android:layout_weight="1"
+                android:textColor="@color/secondary1" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:id="@+id/attendance_name"
+                android:layout_weight="2"
+                android:textAlignment="center"
+                android:textColor="@color/secondary1" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:id="@+id/attendance_stat"
+                android:textAlignment="center"
+                android:layout_weight="1"
+                android:textColor="@color/secondary1" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Percentage"
+                android:id="@+id/attendance_perc"
+                android:textAlignment="center"
+                android:layout_weight="1"
+                android:textColor="@color/secondary1" />
+        </TableRow>
+    </TableLayout>

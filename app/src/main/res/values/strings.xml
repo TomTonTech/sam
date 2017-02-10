@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name" allign="center">Smart Attendance Manager</string>
+    <string name="title_activity_teacher">Teacher</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="username">Username</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome">Welcome</string>
+    <string name="textView_date">Date</string>
+    <string name="textView_period">Period</string>
+    <string name="textView_status">Status</string>
+
+
+    <string name="name">Name</string>
+    <string name="update_attendance">Update Attendance</string>
+    <string name="mark_attendance">Mark Attendance</string>
+    <string name="view_attendance">View Attendance</string>
+    <string name="individual_data">Individual Progress</string>
+    <string name="message">Messages</string>
+    <string name="logout">Logout</string>
+    <string name="textView_assign_class">Assign Class</string>
+    <string name="textView_cpass">Change Password</string>
+    <string name="textView_contact">Contact Us</string>
+    <string name="footertext">Powered By TomTon.</string>
+    <string name="title_activity_update">Update Activity</string>
+    <string name="message_for_date_correction">Dear Sir,\n\t There Was A Mix Up In Attendance On %1$s period of Date %2$s. This Has To Be Changed To %3$s period of %4$s. I Kindly Request You To Update The Following Error I Have Made.\nSorry For The Inconvenience Caused. </string>
+    <string name="message_for_attendance_correction">Dear Sir,\n\t The Attendance Taken On The Date %1$s Of Period %2$s For The Class %3$s %4$s For The Subject %5$s Was By Mistake Incorrect.The Absentees For The Given Details Is %6$s.\n I Humbly Request You To Change The Details As Per Given Above.\n Sorry For The Inconvenience Caused</string>
+
+    <!-- Content Descriptions for imageview-->
+    <string name="content_mark_att">Icon For Mark Attendance</string>
+    <string name="content_update_att">Icon For Update Attendance</string>
+    <string name="content_view_att">Icon For View Attendance</string>
+    <string name="content_indi_pro">Icon For Individual Progress</string>
+    <string name="content_logout">Icon For Logout</string>
+    <string name="content_message">Icon For Message</string>
+    <string name="content_change_pass">Icon For Change Pass</string>
+    <string name="content_tomton">TomTon Logo</string>
+</resources>

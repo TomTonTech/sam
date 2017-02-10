@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:background="@color/secondary1">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:id="@+id/name"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="10dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_weight="2" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Roll No"
+        android:id="@+id/attendance_roll"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@+id/name"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_weight="1"
+        android:textAlignment="center" />
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Present"
+        android:id="@+id/checkBox"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="true"
+        android:focusable="false"
+        android:checked="true"
+        android:contextClickable="false"
+        android:enabled="false"
+        android:layout_alignParentStart="false"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:button="@drawable/colorcode"
+        android:layout_alignBottom="@+id/attendance_roll"
+        app:buttonTint="@color/greencheck"
+        android:layout_weight="1" />
+</LinearLayout>
