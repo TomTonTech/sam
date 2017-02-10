@@ -43,6 +43,7 @@ public class teacherLogin extends AppCompatActivity {
         ctx = this;
         sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
         String name=sharedPreferences.getString("user","");
+        String username=sharedPreferences.getString("username","");
         wel=(TextView)findViewById(R.id.welcometext);
         String weltext="Hi, ".concat(name);
         String[] period = {"1","2","3","4","5","6"};
@@ -98,7 +99,7 @@ public class teacherLogin extends AppCompatActivity {
         }
         @Override
         protected String doInBackground(String... strings) {
-            String name=sharedPreferences.getString("user","");
+            String username=sharedPreferences.getString("username","");
             String subUrl=MainActivity.URL_ADDR.concat("subselect.php");
             try {
                 URL url=new URL(subUrl);
@@ -108,7 +109,7 @@ public class teacherLogin extends AppCompatActivity {
                 httpURLConnection.setDoInput(true);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(name, "UTF-8");
+                String post_data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
                 bufferedWriter.write(post_data);
                 bufferedWriter.flush();
                 bufferedWriter.close();

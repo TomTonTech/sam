@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            String name="",auth="";
+            String name="",auth="",username="";
             int prio=0;
             pdLoading.dismiss();
             if(result.equalsIgnoreCase("unsuccess"))
@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject jsonObject=new JSONObject(result);
                     name=jsonObject.getString("name");
                     prio=jsonObject.getInt("priority");
+                    username=jsonObject.getString("username");
                     auth=jsonObject.getString("authentication");
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -176,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString("user", name);
                         editor.putInt("priority",prio);
+                        editor.putString("username",username);
                         editor.apply();
                         Intent intent = new Intent(MainActivity.this,MainWindow.class);
                         startActivity(intent);

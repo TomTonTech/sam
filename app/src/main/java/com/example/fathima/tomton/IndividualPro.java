@@ -114,7 +114,7 @@ public class IndividualPro extends AppCompatActivity {
         }
         @Override
         protected String doInBackground(String... strings) {
-            String name=sharedPreferences.getString("user","");
+            String name=sharedPreferences.getString("username","");
             String subUrl=MainActivity.URL_ADDR.concat("subselect.php");
             try {
                 URL url=new URL(subUrl);

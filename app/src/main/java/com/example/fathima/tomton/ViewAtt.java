@@ -51,7 +51,7 @@ public class ViewAtt extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_att);
         sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
-        String name=sharedPreferences.getString("user","");
+        String name=sharedPreferences.getString("username","");
         String[] sortSS={"Sort By Roll No","Sort By Hour","Sort By Name","Sort By Percentage"};
         sortS=(Spinner)findViewById(R.id.sort_spinner);
         btn=(Button)findViewById(R.id.view_btn);

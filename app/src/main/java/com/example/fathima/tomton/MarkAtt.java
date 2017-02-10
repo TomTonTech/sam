@@ -37,7 +37,7 @@ public class MarkAtt extends AppCompatActivity {
     protected Context ctx;
     protected Activity avt;
     protected TextView tv_name,tv_roll,tv_stat;
-    protected String sub,div,period,user;
+    protected String sub,div,period,user,username;
     protected ArrayList<String> attended=new ArrayList<>();
     protected ArrayList<String> absent=new ArrayList<>();
     protected ListView listView;
@@ -48,6 +48,7 @@ public class MarkAtt extends AppCompatActivity {
         setContentView(R.layout.activity_mark_att);
         sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
         user=sharedPreferences.getString("user","");
+        username=sharedPreferences.getString("username","");
         ctx = this;
         avt = (Activity) ctx;
         tv_name=(TextView)findViewById(R.id.tv_name);
@@ -220,7 +221,7 @@ public class MarkAtt extends AppCompatActivity {
                 URLConnection conn = url.openConnection();
                 String data = URLEncoder.encode("subcode", "UTF-8") + "=" + URLEncoder.encode(sub, "UTF-8") + "&"
                         + URLEncoder.encode("status", "UTF-8") + "=" + URLEncoder.encode(str, "UTF-8")+"&"
-                        + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(user, "UTF-8")+"&"
+                        + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8")+"&"
                         + URLEncoder.encode("division", "UTF-8") + "=" + URLEncoder.encode(div, "UTF-8")+"&"
                         + URLEncoder.encode("period", "UTF-8") + "=" + URLEncoder.encode(period, "UTF-8");
 
@@ -257,6 +258,7 @@ public class MarkAtt extends AppCompatActivity {
 
             }catch (Exception e)
             {
+                e.printStackTrace();
                 Toast.makeText(ctx,"error while updating please try again after sometime",Toast.LENGTH_SHORT).show();
             }
         }
