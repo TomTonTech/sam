@@ -42,4 +42,7 @@
     <string name="content_message">Icon For Message</string>
     <string name="content_change_pass">Icon For Change Pass</string>
     <string name="content_tomton">TomTon Logo</string>
+    <string name="content_social_facebook">Facebook Icon</string>
+    <string name="content_social_twitter">Twitter Icon</string>
+    <string name="content_social_google">Google Icon</string>
 </resources>

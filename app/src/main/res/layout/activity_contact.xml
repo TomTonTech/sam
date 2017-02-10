@@ -30,17 +30,20 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_social_facebook"
             android:src="@mipmap/ic_facebook_icon"
             android:layout_weight="1" />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_social_twitter"
             android:src="@mipmap/ic_twitter_icon"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1" />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_social_google"
             android:src="@mipmap/ic_google_icon"
             android:layout_weight="1" />
     </LinearLayout>
