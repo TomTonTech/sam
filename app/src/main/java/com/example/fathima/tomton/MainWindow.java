@@ -56,7 +56,7 @@ public class MainWindow extends AppCompatActivity {
         dbh=new DatabaseHelper(ctx);
         int count=dbh.getstudentcount();
         int subcount=dbh.getSubjectCount();
-        Log.v("mainwindow","got count:"+subcount+";get student count: "+count);
+        Log.v("mainwindowchanged by nap","got count:"+subcount+";get student count: "+count);
         if(count==0||subcount==0)
         {
             new AsyncDB().execute();
