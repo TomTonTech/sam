@@ -42,9 +42,7 @@ public class MainActivity extends AppCompatActivity {
         context=this;
         SharedPreferences sharedpreferences = context.getSharedPreferences("Login", 0);
         String user=sharedpreferences.getString("user","");
-        int prio=sharedpreferences.getInt("priority",0);
         int firsttime=sharedpreferences.getInt("firsttime",0);
-        Log.v("mainact","firsttime");
         if(firsttime==0)
         {
             Intent intent=new Intent(MainActivity.this,SplashScreen.class);

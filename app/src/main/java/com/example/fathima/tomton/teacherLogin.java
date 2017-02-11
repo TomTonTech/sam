@@ -43,7 +43,6 @@ public class teacherLogin extends AppCompatActivity {
         ctx = this;
         sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
         String name=sharedPreferences.getString("user","");
-        String username=sharedPreferences.getString("username","");
         wel=(TextView)findViewById(R.id.welcometext);
         String weltext="Hi, ".concat(name);
         String[] period = {"1","2","3","4","5","6"};
@@ -67,17 +66,14 @@ public class teacherLogin extends AppCompatActivity {
                         char c=' ';
                         if(idrb==R.id.radioButton)
                         {
-                            Log.v("teacher","division a selected");
                             c='a';
                         }
                         else if(idrb==R.id.radioButton2)
                         {
                             c='b';
-                            Log.v("teacher","division b selected");
                         }
                         intent.putExtra("division",c);
                         intent.putExtra("period",period);
-                        Log.v("teacherlogin","division is"+intent.getExtras().getChar("division"));
                         Toast.makeText(teacherLogin.this, "Selection Success", Toast.LENGTH_SHORT).show();
                         finish();
                         startActivity(intent);
@@ -105,6 +101,8 @@ public class teacherLogin extends AppCompatActivity {
                 URL url=new URL(subUrl);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setConnectTimeout(MainActivity.CONNECTION_TIMEOUT);
+                httpURLConnection.setReadTimeout(MainActivity.READ_TIMEOUT);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setDoInput(true);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
@@ -119,27 +117,32 @@ public class teacherLogin extends AppCompatActivity {
                 return bufferedReader.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
+                return "exception";
             }
-            return null;
         }
         @Override
         public void onPostExecute(String result)
         {
             pdLoading.dismiss();
             Log.v("teacher",result);
-            try {
-
-                JSONArray jsonArray=new JSONArray(result);
-                JSONObject j=jsonArray.getJSONObject(0);
-                Log.v("teacher","json element:"+j);
-                String subjects = j.getString("subject");
-                Log.v("main", subjects);
-                String[] subject = subjects.split(",");
-                dropdown1 = (Spinner) findViewById(R.id.subject);
-                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
-                dropdown1.setAdapter(adapter1);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if(result.equalsIgnoreCase("exception"))
+            {
+                Log.v("teacherlogin","there is a exception. find from sqlite");
+            }
+            else {
+                try {
+                    JSONArray jsonArray = new JSONArray(result);
+                    JSONObject j = jsonArray.getJSONObject(0);
+                    Log.v("teacher", "json element:" + j);
+                    String subjects = j.getString("subject");
+                    Log.v("main", subjects);
+                    String[] subject = subjects.split(",");
+                    dropdown1 = (Spinner) findViewById(R.id.subject);
+                    ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
+                    dropdown1.setAdapter(adapter1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
