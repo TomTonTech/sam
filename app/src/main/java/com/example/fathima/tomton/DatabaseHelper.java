@@ -110,35 +110,46 @@ class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             // Start the transaction.
             db.beginTransaction();
-            try
-            {
-                for (String branch:branches) {
-                    JSONArray ja=jo.getJSONArray(branch);
-                    for(int i=0;i<ja.length();i++)
-                    {
-                        JSONObject singleJson=ja.getJSONObject(i);
-                        String name,division,semester,rollno,year;
-                        name=singleJson.getString("name");
-                        rollno=singleJson.getString("rollno");
-                        division=singleJson.getString("division");
-                        year=singleJson.getString("year");
-                        semester=singleJson.getString("semester");
-                        ContentValues values;
-                            values = new ContentValues();
-                            values.put(DB_NAME, name);
-                            values.put(DB_SEMESTER,semester);
-                            values.put(DB_YEARIN,year);
-                            values.put(DB_DIVISION,division);
-                            values.put(DB_ROLLNO,rollno);
-                            values.put(DB_BRANCH,branch);
-                            long ins = db.insert(STUDENT_TABLE, null, values);
-                            Log.v("Insert in student", ins + "");
-                            // Insert into database successfully.
+            try {
+                for (String branch : branches) {
+                    try {
+                        JSONArray ja = jo.getJSONArray(branch);
+
+                        for (int i = 0; i < ja.length(); i++) {
+                            JSONObject singleJson = ja.getJSONObject(i);
+                            String name, division, semester, rollno, year;
+                            name = singleJson.getString("name");
+                            rollno = singleJson.getString("rollno");
+                            division = singleJson.getString("division");
+                            year = singleJson.getString("year");
+                            semester = singleJson.getString("semester");
+                            String query = "SELECT " + DB_NAME + " FROM " + STUDENT_TABLE + " WHERE "
+                                    + DB_YEARIN + "=" + year + " AND "
+                                    + DB_BRANCH + " LIKE '" + branch + "' AND "
+                                    + DB_DIVISION + " LIKE '" + division + "' AND "
+                                    + DB_ROLLNO + "=" + rollno;
+                            Cursor c = db.rawQuery(query, null);
+                            if (c.getCount() <= 0) {
+                                ContentValues values;
+                                values = new ContentValues();
+                                values.put(DB_NAME, name);
+                                values.put(DB_SEMESTER, semester);
+                                values.put(DB_YEARIN, year);
+                                values.put(DB_DIVISION, division);
+                                values.put(DB_ROLLNO, rollno);
+                                values.put(DB_BRANCH, branch);
+                                long ins = db.insert(STUDENT_TABLE, null, values);
+                                Log.v("Insert in student", ins + "");
+                                // Insert into database successfully.
+                            } else {
+                                Log.v("database", "already exist:" + rollno);
+                            }
+                            c.close();
+                        }
+                    } catch (JSONException je) {
+                        Log.v("database", "nothing to worry");
                     }
                 }
-            }catch (JSONException e)
-            {
-                Log.v("datahelper","no thing to worry");
             }
             catch (SQLiteException e)
             {
@@ -247,6 +258,30 @@ class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
             db.close();
         }
+    }
+    public JSONArray syncAttendance()
+    {
+        SQLiteDatabase db=this.getReadableDatabase();
+        String query="SELECT 8 FROM "+ATTENDANCE_TABLE;
+        Cursor c=db.rawQuery(query,null);
+        try
+        {
+            JSONArray ja=new JSONArray();
+            while(c.moveToNext())
+            {
+                JSONObject jo=new JSONObject();
+                jo.put("branch",c.getString(c.getColumnIndex(DB_BRANCH)));
+                jo.put("year",c.getString(c.getColumnIndex(DB_YEARIN)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_DIVISION)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_USERNAME)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_SUBJECTCODE)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_PERIOD)));
+            }
+        }catch (JSONException je)
+        {
+            return null;
+        }
+        return null;
     }
     //TODO:Subject details.
     int getSubjectCount()

@@ -132,6 +132,12 @@ public class MarkAtt extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Log.v("hahaha","reach here");
+                        String str="";
+                        if(!absent.isEmpty()) {
+                            str = absent.get(0);
+                            for (int i = 1; i < absent.size(); i++)
+                                str = str + "," + absent.get(i);
+                        }
                         UpAsync upAsync=new UpAsync();
                         upAsync.execute(sub);
                     }
@@ -260,12 +266,7 @@ public class MarkAtt extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String sub = params[0];
-            String str="";
-            if(!absent.isEmpty()) {
-                str = absent.get(0);
-                for (int i = 1; i < absent.size(); i++)
-                    str = str + "," + absent.get(i);
-            }
+            String str=params[1];
             try {
                 Log.v("hehe","subject"+sub+"\nabsent:"+str);
                 String upUrl=MainActivity.URL_ADDR.concat("update_student_att.php");

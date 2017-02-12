@@ -1,13 +1,10 @@
 package com.example.fathima.tomton;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,21 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 
 public class MainWindow extends AppCompatActivity {
     protected Context ctx;
@@ -63,7 +45,7 @@ public class MainWindow extends AppCompatActivity {
         Log.v("mainwindow","got count:"+subcount+";get student count: "+count);
         if(count==0||subcount==0)
         {
-            new AsyncDB().execute();
+            new AsyncDB(ctx).execute();
         }
     }
     @Override
@@ -82,6 +64,18 @@ public class MainWindow extends AppCompatActivity {
                 return true;
             case R.id.action_download:
                 // location found
+                new AlertDialog.Builder(ctx)
+                        .setIcon(R.drawable.ic_download)
+                        .setTitle("Download Data")
+                        .setMessage("There May Be No Changes On The Data After The Last Sync. Do You Really Wish To Download Data ?")
+                        .setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new AsyncDB(ctx).execute();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
                 Log.v("window","download clicked");
                 return true;
             case R.id.action_settings:
@@ -148,54 +142,5 @@ public class MainWindow extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    private class AsyncDB extends AsyncTask<String,Void,String>
-    {
-        ProgressDialog pd;
-        @Override
-        protected void onPreExecute()
-        {
-            pd=ProgressDialog.show(ctx,"First Time","Downloading Student Details",true);
-        }
-        @Override
-        protected String doInBackground(String... strings) {
-            String subUrl=MainActivity.URL_ADDR.concat("sync.php");
-            try {
-                URL url=new URL(subUrl);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setConnectTimeout(MainActivity.CONNECTION_TIMEOUT);
-                httpURLConnection.setReadTimeout(MainActivity.READ_TIMEOUT);
-                httpURLConnection.setDoInput(true);
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "ISO-8859-1"));
-                return bufferedReader.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "exception";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result)
-        {
-            try {
-                Boolean syncB;
-                JSONObject jo=new JSONObject(result);
-                JSONObject jStudent=jo.getJSONObject("students");
-                syncB=dbh.syncStudentData(jStudent.toString());
-                JSONArray jSubject=jo.getJSONArray("subject");
-                Boolean syncSubB=dbh.syncSubjectData(jSubject.toString());
-                if(syncB&&syncSubB)
-                {
-                    Toast.makeText(ctx,"Successfully Downloaded Data From Server.",Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    Toast.makeText(ctx,"There Was An Error In Inserting.Press Sync Again To Download Again.",Toast.LENGTH_LONG).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            pd.dismiss();
-        }
-    }
+
 }
