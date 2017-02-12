@@ -12,6 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by general on 10/8/2016.
  * this is to add data to the sqlite database in users phone
@@ -19,8 +22,9 @@ import org.json.JSONObject;
 class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "lbs.db";
     private static final String STUDENT_TABLE = "student_details";
-    private static final String SUBJECT_TABLE = "POST_FEED";
-    private static final int DATABASE_VERSION = 2;
+    private static final String SUBJECT_TABLE = "subject";
+    private static final String ATTENDANCE_TABLE = "attendance";
+    private static final int DATABASE_VERSION = 4;
     private static final String DB_NAME = "NAME";
     private static final String DB_ROLLNO = "ROLLNO";
     private static final String DB_BRANCH = "BRANCH";
@@ -48,8 +52,21 @@ class DatabaseHelper extends SQLiteOpenHelper {
                                         DB_SEMESTER+" VARCHAR(5) NOT NULL)";
     private static final String DELETE_SUBJECT_TABLE = "DROP TABLE IF EXISTS " + SUBJECT_TABLE;
     //declaration of subject table ends
-
-
+    private static final String DB_USERNAME="USERNAME";
+    private static final String DB_ABSENT="ABSENT";
+    private static final String DB_DATE="DATE";
+    private static final String DB_PERIOD="PERIOD";
+    private static final String CREATE_ATTENDACE_TABLE = "CREATE TABLE IF NOT EXISTS " + ATTENDANCE_TABLE + "("+
+            DB_SUBJECTCODE+" VARCHAR(15) NOT NULL,"+
+            DB_DATE+" VARCHAR(12) NOT NULL," +
+            DB_DIVISION+ " VARCHAR(3) NOT NULL,"+
+            DB_YEARIN+" INT NOT NULL,"+
+            DB_PERIOD+" INT NOT NULL,"+
+            DB_BRANCH+" VARCHAR(7) NOT NULL,"+
+            DB_USERNAME+" TEXT NOT NULL,"+
+            DB_ABSENT+" TEXT NOT NULL,"+
+            DB_SEMESTER+" VARCHAR(4) NOT NULL)";
+    private static final String DELETE_ATTENDANCE_TABLE = "DROP TABLE IF EXISTS " + ATTENDANCE_TABLE;
     DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
@@ -60,6 +77,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
         // Create the table
         db.execSQL(CREATE_STUDENT_TABLE);
         db.execSQL(CREATE_SUBJECT_TABLE);
+        db.execSQL(CREATE_ATTENDACE_TABLE);
         Log.v("databasehelper","created database");
     }
     //Upgrading database
@@ -68,7 +86,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
         //Drop older table if existed
         db.execSQL(DELETE_STUDENT_TABLE);
         db.execSQL(DELETE_SUBJECT_TABLE);
+        db.execSQL(DELETE_ATTENDANCE_TABLE);
         //Create tables again
+        Log.v("datahelper","upgraded database.");
         onCreate(db);
     }
     //TODO:STUDENT DETAILS
@@ -90,35 +110,46 @@ class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             // Start the transaction.
             db.beginTransaction();
-            try
-            {
-                for (String branch:branches) {
-                    JSONArray ja=jo.getJSONArray(branch);
-                    for(int i=0;i<ja.length();i++)
-                    {
-                        JSONObject singleJson=ja.getJSONObject(i);
-                        String name,division,semester,rollno,year;
-                        name=singleJson.getString("name");
-                        rollno=singleJson.getString("rollno");
-                        division=singleJson.getString("division");
-                        year=singleJson.getString("year");
-                        semester=singleJson.getString("semester");
-                        ContentValues values;
-                            values = new ContentValues();
-                            values.put(DB_NAME, name);
-                            values.put(DB_SEMESTER,semester);
-                            values.put(DB_YEARIN,year);
-                            values.put(DB_DIVISION,division);
-                            values.put(DB_ROLLNO,rollno);
-                            values.put(DB_BRANCH,branch);
-                            long ins = db.insert(STUDENT_TABLE, null, values);
-                            Log.v("Insert in student", ins + "");
-                            // Insert into database successfully.
+            try {
+                for (String branch : branches) {
+                    try {
+                        JSONArray ja = jo.getJSONArray(branch);
+
+                        for (int i = 0; i < ja.length(); i++) {
+                            JSONObject singleJson = ja.getJSONObject(i);
+                            String name, division, semester, rollno, year;
+                            name = singleJson.getString("name");
+                            rollno = singleJson.getString("rollno");
+                            division = singleJson.getString("division");
+                            year = singleJson.getString("year");
+                            semester = singleJson.getString("semester");
+                            String query = "SELECT " + DB_NAME + " FROM " + STUDENT_TABLE + " WHERE "
+                                    + DB_YEARIN + "=" + year + " AND "
+                                    + DB_BRANCH + " LIKE '" + branch + "' AND "
+                                    + DB_DIVISION + " LIKE '" + division + "' AND "
+                                    + DB_ROLLNO + "=" + rollno;
+                            Cursor c = db.rawQuery(query, null);
+                            if (c.getCount() <= 0) {
+                                ContentValues values;
+                                values = new ContentValues();
+                                values.put(DB_NAME, name);
+                                values.put(DB_SEMESTER, semester);
+                                values.put(DB_YEARIN, year);
+                                values.put(DB_DIVISION, division);
+                                values.put(DB_ROLLNO, rollno);
+                                values.put(DB_BRANCH, branch);
+                                long ins = db.insert(STUDENT_TABLE, null, values);
+                                Log.v("Insert in student", ins + "");
+                                // Insert into database successfully.
+                            } else {
+                                Log.v("database", "already exist:" + rollno);
+                            }
+                            c.close();
+                        }
+                    } catch (JSONException je) {
+                        Log.v("database", "nothing to worry");
                     }
                 }
-            }catch (JSONException e)
-            {
-                Log.v("datahelper","no thing to worry");
             }
             catch (SQLiteException e)
             {
@@ -136,6 +167,121 @@ class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return false;
         }
+    }
+    JSONArray getStudentDetails(String subjectcode,String division)
+    {
+        SQLiteDatabase db=this.getReadableDatabase();
+        JSONArray ja=new JSONArray();
+        Log.v("database","subject:"+subjectcode+";division:"+division);
+        division=division.toUpperCase();
+        String subjectQuery="Select "+DB_BRANCH+","+DB_YEARIN+","+DB_SUBJECTCODE+" FROM "+SUBJECT_TABLE+" WHERE "+DB_SUBJECTCODE+" LIKE '"+subjectcode+"'";
+        Cursor c=db.rawQuery(subjectQuery,null);
+        String branch="",yearin="";
+        Log.v("databasehelper","inside if:c.getCount"+c.getCount());
+        while(c.moveToNext())
+        {
+            branch=c.getString(c.getColumnIndex(DB_BRANCH));
+            branch=branch.toLowerCase();
+            yearin=c.getString(c.getColumnIndex(DB_YEARIN));
+            Log.v("databasehelper","branch:"+branch+";year:"+yearin+";subjectcode:"+c.getString(c.getColumnIndex(DB_SUBJECTCODE)));
+        }
+        c.close();
+        String studentQuery="SELECT "+DB_NAME+","+DB_ROLLNO+" FROM "+STUDENT_TABLE+" WHERE "
+                +DB_YEARIN+"="+yearin+" AND "+DB_BRANCH+"='"+branch+"' AND "+DB_DIVISION+"='"+division+"'";
+        Cursor c1=db.rawQuery(studentQuery,null);
+        try {
+            while (c1.moveToNext()) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", c1.getString(c1.getColumnIndex(DB_NAME)));
+                jo.put("rollno", c1.getInt(c1.getColumnIndex(DB_ROLLNO)));
+                ja.put(jo);
+            }
+            Log.v("database","jsonarray:"+ja);
+            return ja;
+        }catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        c1.close();
+        return null;
+    }
+    //TODO:attendance Marker
+    Boolean addAttendance(String[] data)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Start the transaction.
+        db.beginTransaction();
+        ContentValues values;
+        String username=data[0];
+        String subjectcode=data[1].toUpperCase();
+        String division=data[2];
+        String period=data[3];
+        String absent=data[4];
+        String date;
+        Date dNow = new Date( );
+        SimpleDateFormat ft =
+                new SimpleDateFormat("dd/mm/yyyy");
+        date=ft.format(dNow);
+        Log.v("database","date:"+date);
+        String branch="",yearin="",semester="";
+        String getSubDetail="SELECT "+DB_BRANCH+","+DB_YEARIN+","+DB_SEMESTER+" FROM "+SUBJECT_TABLE
+                                                    + " WHERE "+DB_SUBJECTCODE+" LIKE '"+subjectcode+"'";
+        Cursor c=db.rawQuery(getSubDetail,null);
+        if(c.moveToNext())
+        {
+            branch=c.getString(c.getColumnIndex(DB_BRANCH));
+            yearin=c.getString(c.getColumnIndex(DB_YEARIN));
+            semester=c.getString(c.getColumnIndex(DB_SEMESTER));
+        }
+        try {
+            values = new ContentValues();
+            values.put(DB_USERNAME, username);
+            values.put(DB_SUBJECTCODE, subjectcode);
+            values.put(DB_DIVISION, division);
+            values.put(DB_PERIOD, period);
+            values.put(DB_BRANCH, branch);
+            values.put(DB_SEMESTER, semester);
+            values.put(DB_ABSENT, absent);
+            values.put(DB_YEARIN, yearin);
+            values.put(DB_DATE,date);
+            long i = db.insert(ATTENDANCE_TABLE, null, values);
+            Log.i("Insert", i + "");
+            db.setTransactionSuccessful();
+            return true;
+        }catch (SQLiteException se)
+        {
+            se.printStackTrace();
+            return false;
+        }
+        finally {
+            c.close();
+            db.endTransaction();
+            db.close();
+        }
+    }
+    public JSONArray syncAttendance()
+    {
+        SQLiteDatabase db=this.getReadableDatabase();
+        String query="SELECT 8 FROM "+ATTENDANCE_TABLE;
+        Cursor c=db.rawQuery(query,null);
+        try
+        {
+            JSONArray ja=new JSONArray();
+            while(c.moveToNext())
+            {
+                JSONObject jo=new JSONObject();
+                jo.put("branch",c.getString(c.getColumnIndex(DB_BRANCH)));
+                jo.put("year",c.getString(c.getColumnIndex(DB_YEARIN)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_DIVISION)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_USERNAME)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_SUBJECTCODE)));
+                jo.put("branch",c.getString(c.getColumnIndex(DB_PERIOD)));
+            }
+        }catch (JSONException je)
+        {
+            return null;
+        }
+        return null;
     }
     //TODO:Subject details.
     int getSubjectCount()
@@ -203,5 +349,41 @@ class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return false;
         }
+    }
+    String[] getTutorSubject(int year,String branch)
+    {
+        String countQuery = "SELECT "+DB_SUBJECTCODE+" FROM " + SUBJECT_TABLE+" WHERE "+DB_BRANCH+"='"+branch+"' AND "+DB_YEARIN+"='"+year+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        String[] subject=new String[cursor.getCount()];
+        int i=0;
+        while(cursor.moveToNext())
+        {
+            subject[i]=cursor.getString(cursor.getColumnIndex("SUBJECTCODE"));
+            i++;
+        }
+        cursor.close();
+        if(subject.length>0)
+            return subject;
+        else
+            return null;
+    }
+    String[] getHodSubject(String branch)
+    {
+        String countQuery = "SELECT "+DB_SUBJECTCODE+" FROM " + SUBJECT_TABLE+" WHERE "+DB_BRANCH+"='"+branch+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        String[] subject=new String[cursor.getCount()];
+        int i=0;
+        while(cursor.moveToNext())
+        {
+            subject[i]=cursor.getString(cursor.getColumnIndex("SUBJECTCODE"));
+            i++;
+        }
+        cursor.close();
+        if(subject.length>0)
+            return subject;
+        else
+            return null;
     }
 }

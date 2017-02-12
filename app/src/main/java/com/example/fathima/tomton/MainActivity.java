@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            String name="",auth="",username="";
+            String name="",auth="",username="",branch="",designation="",subject="";
             int prio=0;
             pdLoading.dismiss();
             if(result.equalsIgnoreCase("unsuccess"))
@@ -167,6 +167,10 @@ public class MainActivity extends AppCompatActivity {
                     prio=jsonObject.getInt("priority");
                     username=jsonObject.getString("username");
                     auth=jsonObject.getString("authentication");
+                    branch=jsonObject.getString("branch");
+                    designation=jsonObject.getString("designation");
+                    subject=jsonObject.getString("subject");
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -177,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("user", name);
                         editor.putInt("priority",prio);
                         editor.putString("username",username);
+                        editor.putString("branch",branch);
+                        editor.putString("designation",designation);
+                        editor.putString("subject",subject);
                         editor.apply();
                         Intent intent = new Intent(MainActivity.this,MainWindow.class);
                         startActivity(intent);
