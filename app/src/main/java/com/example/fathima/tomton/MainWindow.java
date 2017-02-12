@@ -1,5 +1,6 @@
 package com.example.fathima.tomton;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,6 +11,9 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -60,6 +64,32 @@ public class MainWindow extends AppCompatActivity {
         if(count==0||subcount==0)
         {
             new AsyncDB().execute();
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main_actions, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Take appropriate action for each action item click
+        switch (item.getItemId()) {
+            case R.id.action_sync:
+                // search action
+                Log.v("window","sync clicked");
+                return true;
+            case R.id.action_download:
+                // location found
+                Log.v("window","download clicked");
+                return true;
+            case R.id.action_settings:
+                // refresh
+                Log.v("window","settings clicked");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
     public void markFunction(View view)

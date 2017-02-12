@@ -147,6 +147,7 @@ public class MarkAtt extends AppCompatActivity {
             String subject = params[0];
             try {
                 String stdUrl=MainActivity.URL_ADDR.concat("stdselect.php");
+                Log.v("markatt","url:"+stdUrl);
                 URL url = new URL(stdUrl);
                 URLConnection conn = url.openConnection();
                 String data = URLEncoder.encode("subject", "UTF-8") + "=" + URLEncoder.encode(subject, "UTF-8")+"&"+
@@ -259,14 +260,13 @@ public class MarkAtt extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String sub = params[0];
-
+            String str="";
+            if(!absent.isEmpty()) {
+                str = absent.get(0);
+                for (int i = 1; i < absent.size(); i++)
+                    str = str + "," + absent.get(i);
+            }
             try {
-                String str="";
-                if(!absent.isEmpty()) {
-                    str = absent.get(0);
-                    for (int i = 1; i < absent.size(); i++)
-                        str = str + "," + absent.get(i);
-                }
                 Log.v("hehe","subject"+sub+"\nabsent:"+str);
                 String upUrl=MainActivity.URL_ADDR.concat("update_student_att.php");
                 URL url = new URL(upUrl);
@@ -292,14 +292,35 @@ public class MarkAtt extends AppCompatActivity {
                 return reader.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
-
-                return "nonet";
+                String[] data=new String[6];
+                data[0]=username;
+                data[1]=sub;
+                data[2]=div;
+                data[3]=period;
+                data[4]=str;
+                if(dbh.addAttendance(data))
+                {
+                    return "success";
+                }
+                else
+                {
+                    return "unsuccess";
+                }
             }
         }
         @Override
         protected void onPostExecute(String result) {
             Log.v("teacher",result);
-                pdLoading.dismiss();
+            pdLoading.dismiss();
+            if(result.equalsIgnoreCase("success"))
+            {
+                Toast.makeText(ctx, "The Attendance Is Saved In Local.Connect To Internet To Sync", Toast.LENGTH_LONG).show();
+            }
+            else if(result.equalsIgnoreCase("unsuccess"))
+            {
+                Toast.makeText(ctx, "SomeThing Went wrong.Please Try Again Later.", Toast.LENGTH_LONG).show();
+            }
+            else {
                 try {
                     JSONArray ja = new JSONArray(result);
                     JSONObject jo = ja.getJSONObject(0);
@@ -310,12 +331,12 @@ public class MarkAtt extends AppCompatActivity {
                     }
                     msg += jo.getString("message");
                     Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(ctx, "error while updating please try again after sometime", Toast.LENGTH_SHORT).show();
                 }
             }
+        }
 
     }
 }

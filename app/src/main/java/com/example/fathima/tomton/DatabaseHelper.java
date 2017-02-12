@@ -12,6 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by general on 10/8/2016.
  * this is to add data to the sqlite database in users phone
@@ -21,7 +24,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     private static final String STUDENT_TABLE = "student_details";
     private static final String SUBJECT_TABLE = "subject";
     private static final String ATTENDANCE_TABLE = "attendance";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DB_NAME = "NAME";
     private static final String DB_ROLLNO = "ROLLNO";
     private static final String DB_BRANCH = "BRANCH";
@@ -54,7 +57,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_DATE="DATE";
     private static final String DB_PERIOD="PERIOD";
     private static final String CREATE_ATTENDACE_TABLE = "CREATE TABLE IF NOT EXISTS " + ATTENDANCE_TABLE + "("+
-            DB_SUBJECTCODE+" VARCHAR(15) NOT NULL PRIMARY KEY,"+
+            DB_SUBJECTCODE+" VARCHAR(15) NOT NULL,"+
             DB_DATE+" VARCHAR(12) NOT NULL," +
             DB_DIVISION+ " VARCHAR(3) NOT NULL,"+
             DB_YEARIN+" INT NOT NULL,"+
@@ -194,13 +197,22 @@ class DatabaseHelper extends SQLiteOpenHelper {
     //TODO:attendance Marker
     Boolean addAttendance(String[] data)
     {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Start the transaction.
+        db.beginTransaction();
+        ContentValues values;
         String username=data[0];
         String subjectcode=data[1].toUpperCase();
         String division=data[2];
         String period=data[3];
         String absent=data[4];
+        String date;
+        Date dNow = new Date( );
+        SimpleDateFormat ft =
+                new SimpleDateFormat("dd/mm/yyyy");
+        date=ft.format(dNow);
+        Log.v("database","date:"+date);
         String branch="",yearin="",semester="";
-        SQLiteDatabase db=this.getReadableDatabase();
         String getSubDetail="SELECT "+DB_BRANCH+","+DB_YEARIN+","+DB_SEMESTER+" FROM "+SUBJECT_TABLE
                                                     + " WHERE "+DB_SUBJECTCODE+" LIKE '"+subjectcode+"'";
         Cursor c=db.rawQuery(getSubDetail,null);
@@ -210,8 +222,31 @@ class DatabaseHelper extends SQLiteOpenHelper {
             yearin=c.getString(c.getColumnIndex(DB_YEARIN));
             semester=c.getString(c.getColumnIndex(DB_SEMESTER));
         }
-        c.close();
-        return true;
+        try {
+            values = new ContentValues();
+            values.put(DB_USERNAME, username);
+            values.put(DB_SUBJECTCODE, subjectcode);
+            values.put(DB_DIVISION, division);
+            values.put(DB_PERIOD, period);
+            values.put(DB_BRANCH, branch);
+            values.put(DB_SEMESTER, semester);
+            values.put(DB_ABSENT, absent);
+            values.put(DB_YEARIN, yearin);
+            values.put(DB_DATE,date);
+            long i = db.insert(ATTENDANCE_TABLE, null, values);
+            Log.i("Insert", i + "");
+            db.setTransactionSuccessful();
+            return true;
+        }catch (SQLiteException se)
+        {
+            se.printStackTrace();
+            return false;
+        }
+        finally {
+            c.close();
+            db.endTransaction();
+            db.close();
+        }
     }
     //TODO:Subject details.
     int getSubjectCount()
