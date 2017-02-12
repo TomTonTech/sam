@@ -48,7 +48,7 @@ public class ChangePass extends AppCompatActivity {
     protected void changePass(View view)
     {
         String str_cur,str_new,str_conf,str_user;
-        str_user=sp.getString("user","");
+        str_user=sp.getString("username","");
         str_cur=eCurrent.getText().toString();
         str_new=eNew.getText().toString();
         str_conf=eConf.getText().toString();
@@ -59,6 +59,10 @@ public class ChangePass extends AppCompatActivity {
         else if(!str_new.equals(str_conf))
         {
             Toast.makeText(ctx,"Password Mismatch",Toast.LENGTH_SHORT).show();
+        }
+        else if(str_cur.equals(str_new))
+        {
+            Toast.makeText(ctx,"Can't Give Same Password Again.Give Another Password.",Toast.LENGTH_SHORT).show();
         }
         else if(str_new.length()<6 || str_new.length()>20)
         {
