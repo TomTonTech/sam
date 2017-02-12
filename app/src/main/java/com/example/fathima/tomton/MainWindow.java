@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.ParseException;
 
 public class MainWindow extends AppCompatActivity {
     protected Context ctx;
@@ -61,6 +75,11 @@ public class MainWindow extends AppCompatActivity {
             case R.id.action_sync:
                 // search action
                 Log.v("window","sync clicked");
+                JSONArray ja=dbh.syncAttendance();
+                if(ja.length()!=0)
+                {
+                    new AsyncAtt().execute(String.valueOf(ja));
+                }
                 return true;
             case R.id.action_download:
                 // location found
@@ -142,5 +161,59 @@ public class MainWindow extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-
+    public class AsyncAtt extends AsyncTask<String,Void,String>
+    {
+        @Override
+        protected String doInBackground(String... strings) {
+            String data=strings[0];
+            Log.v("window","data:"+data);
+            String subUrl= MainActivity.URL_ADDR.concat("syncAtt.php");
+            try {
+                URL url=new URL(subUrl);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setConnectTimeout(MainActivity.CONNECTION_TIMEOUT);
+                httpURLConnection.setReadTimeout(MainActivity.READ_TIMEOUT);
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                String urldata = URLEncoder.encode("data", "UTF-8") + "=" + URLEncoder.encode(data, "UTF-8");
+                OutputStreamWriter wr = new OutputStreamWriter(httpURLConnection.getOutputStream());
+                wr.write(urldata);
+                wr.flush();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "ISO-8859-1"));
+                return bufferedReader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "exception";
+            }
+        }
+        @Override
+        public void onPostExecute(String result)
+        {
+            Log.v("window","result:"+result);
+            if(result.equalsIgnoreCase("exception"))
+            {
+                Toast.makeText(ctx,"No Internet Connection. Check Connection And Try Again Later.",Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                if(result.equalsIgnoreCase("same"))
+                {
+                    Toast.makeText(ctx,"You Have Already Inserted This data.",Toast.LENGTH_SHORT).show();
+                }else if(result.equalsIgnoreCase("sameperiod"))
+                {
+                    Toast.makeText(ctx,"There Was An Identical Insertion.Check If Your Insertion Is Correct.Successfully inserted data.",Toast.LENGTH_LONG).show();
+                }
+                else if(result.equalsIgnoreCase("success"))
+                {
+                    Toast.makeText(ctx,"Successfully Synced Data.",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(ctx,"Something Went Wrong.Contact App Developer.",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
 }

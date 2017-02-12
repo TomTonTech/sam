@@ -139,7 +139,7 @@ public class MarkAtt extends AppCompatActivity {
                                 str = str + "," + absent.get(i);
                         }
                         UpAsync upAsync=new UpAsync();
-                        upAsync.execute(sub);
+                        upAsync.execute(sub,str);
                     }
 
                 })

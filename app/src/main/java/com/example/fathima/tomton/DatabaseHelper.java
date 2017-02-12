@@ -262,8 +262,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
     public JSONArray syncAttendance()
     {
         SQLiteDatabase db=this.getReadableDatabase();
-        String query="SELECT 8 FROM "+ATTENDANCE_TABLE;
+        String query="SELECT * FROM "+ATTENDANCE_TABLE;
         Cursor c=db.rawQuery(query,null);
+        Log.v("test","length:"+c.getCount());
         try
         {
             JSONArray ja=new JSONArray();
@@ -272,16 +273,20 @@ class DatabaseHelper extends SQLiteOpenHelper {
                 JSONObject jo=new JSONObject();
                 jo.put("branch",c.getString(c.getColumnIndex(DB_BRANCH)));
                 jo.put("year",c.getString(c.getColumnIndex(DB_YEARIN)));
-                jo.put("branch",c.getString(c.getColumnIndex(DB_DIVISION)));
-                jo.put("branch",c.getString(c.getColumnIndex(DB_USERNAME)));
-                jo.put("branch",c.getString(c.getColumnIndex(DB_SUBJECTCODE)));
-                jo.put("branch",c.getString(c.getColumnIndex(DB_PERIOD)));
+                jo.put("division",c.getString(c.getColumnIndex(DB_DIVISION)));
+                jo.put("username",c.getString(c.getColumnIndex(DB_USERNAME)));
+                jo.put("subjectcode",c.getString(c.getColumnIndex(DB_SUBJECTCODE)));
+                jo.put("period",c.getString(c.getColumnIndex(DB_PERIOD)));
+                jo.put("date",c.getString(c.getColumnIndex(DB_DATE)));
+                jo.put("absent",c.getString(c.getColumnIndex(DB_ABSENT)));
+                jo.put("semester",c.getString(c.getColumnIndex(DB_SEMESTER)));
+                ja.put(jo);
             }
+            return ja;
         }catch (JSONException je)
         {
             return null;
         }
-        return null;
     }
     //TODO:Subject details.
     int getSubjectCount()
