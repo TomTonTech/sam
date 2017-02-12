@@ -260,12 +260,13 @@ class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-    public JSONArray syncAttendance()
+    JSONArray syncAttendance()
     {
         SQLiteDatabase db=this.getReadableDatabase();
         String query="SELECT * FROM "+ATTENDANCE_TABLE;
         Cursor c=db.rawQuery(query,null);
         Log.v("test","length:"+c.getCount());
+        db.beginTransaction();
         try
         {
             JSONArray ja=new JSONArray();
@@ -283,10 +284,15 @@ class DatabaseHelper extends SQLiteOpenHelper {
                 jo.put("semester",c.getString(c.getColumnIndex(DB_SEMESTER)));
                 ja.put(jo);
             }
+            c.close();
             return ja;
         }catch (JSONException je)
         {
             return null;
+        }
+        finally {
+            db.endTransaction();
+            db.close();
         }
     }
     Boolean deleteAttendance()
