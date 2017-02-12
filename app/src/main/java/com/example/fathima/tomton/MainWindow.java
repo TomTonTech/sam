@@ -148,7 +148,7 @@ public class MainWindow extends AppCompatActivity {
         protected void onPostExecute(String result)
         {
             try {
-                Boolean syncB=true;
+                Boolean syncB;
                 JSONObject jo=new JSONObject(result);
                 JSONObject jStudent=jo.getJSONObject("students");
                 syncB=dbh.syncStudentData(jStudent.toString());

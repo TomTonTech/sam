@@ -35,6 +35,7 @@ public class teacherLogin extends AppCompatActivity {
     public TextView wel;
     protected Spinner dropdown1,periodS;
     protected Context ctx;
+    protected SqliteSelect ss;
     SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +46,16 @@ public class teacherLogin extends AppCompatActivity {
         String name=sharedPreferences.getString("user","");
         wel=(TextView)findViewById(R.id.welcometext);
         String weltext="Hi, ".concat(name);
+        ss=new SqliteSelect(ctx);
         String[] period = {"1","2","3","4","5","6"};
         periodS = (Spinner) findViewById(R.id.spinner_period);
         ArrayAdapter<String> adapter2 = new ArrayAdapter<>(ctx,R.layout.spinner_layout, period);
         periodS.setAdapter(adapter2);
         wel.setText(weltext);
-        new AsyncSub().execute();
+        String[] subject = ss.selectSubject();
+        dropdown1 = (Spinner) findViewById(R.id.subject);
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
+        dropdown1.setAdapter(adapter1);
         final RadioGroup rb=(RadioGroup) findViewById(R.id.radiogroup);
         btn = (Button) findViewById(R.id.btn_teacher);
         btn.setOnClickListener(

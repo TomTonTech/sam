@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -42,6 +44,7 @@ public class MarkAtt extends AppCompatActivity {
     protected ArrayList<String> absent=new ArrayList<>();
     protected ListView listView;
     protected SharedPreferences sharedPreferences;
+    protected DatabaseHelper dbh;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,7 @@ public class MarkAtt extends AppCompatActivity {
         username=sharedPreferences.getString("username","");
         ctx = this;
         avt = (Activity) ctx;
+        dbh=new DatabaseHelper(ctx);
         tv_name=(TextView)findViewById(R.id.tv_name);
         tv_roll=(TextView)findViewById(R.id.tv_roll);
         tv_stat=(TextView)findViewById(R.id.tv_stat);
@@ -67,8 +71,56 @@ public class MarkAtt extends AppCompatActivity {
             this.div=String.valueOf(div);
         }
         listView = (ListView) findViewById(R.id.listView);
-        StdAysnc stdAysnc = new StdAysnc();
-        stdAysnc.execute(sub);
+        JSONArray jsonArray=dbh.getStudentDetails(sub,div);
+        int len = jsonArray.length();
+        String[] name = new String[len];
+        String[] roll = new String[len];
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject c = jsonArray.getJSONObject(i);
+                name[i] = c.getString("name");
+                roll[i] = c.getString("rollno");
+                if (Integer.parseInt(roll[i]) < 10) {
+                    roll[i] = "0" + roll[i];
+                }
+                attended.add(roll[i]);
+            }
+        }catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        final CustomList customList = new CustomList(avt, name, roll);
+        listView.setAdapter(customList);
+        listView.setItemsCanFocus(true);
+        listView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String roll=((TextView)view.findViewById(R.id.attendance_roll)).getText().toString();
+                        CheckBox checkBox=(CheckBox)view.findViewById(R.id.checkBox);
+                        if(checkBox.isChecked())
+                        {
+                            String chk="Absent";
+                            checkBox.setChecked(false);
+                            checkBox.setText(chk);
+                            Log.v("hahah","Student Absent");
+                            attended.remove(roll);
+                            absent.add(roll);
+                        }
+                        else{
+
+                            String chk="Present";
+                            Log.v("hahah","Student Present");
+                            checkBox.setChecked(true);
+                            checkBox.setText(chk);
+                            attended.add(roll);
+                            absent.remove(roll);
+                        }
+                    }
+                }
+        );
+        //StdAysnc stdAysnc = new StdAysnc();
+        //stdAysnc.execute(sub);
     }
     public  void checkSubmit(View arg0)
     {
@@ -218,7 +270,7 @@ public class MarkAtt extends AppCompatActivity {
                 Log.v("hehe","subject"+sub+"\nabsent:"+str);
                 String upUrl=MainActivity.URL_ADDR.concat("update_student_att.php");
                 URL url = new URL(upUrl);
-                URLConnection conn = url.openConnection();
+                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
                 String data = URLEncoder.encode("subcode", "UTF-8") + "=" + URLEncoder.encode(sub, "UTF-8") + "&"
                         + URLEncoder.encode("status", "UTF-8") + "=" + URLEncoder.encode(str, "UTF-8")+"&"
                         + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8")+"&"
@@ -227,41 +279,43 @@ public class MarkAtt extends AppCompatActivity {
 
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
+                conn.setReadTimeout(MainActivity.READ_TIMEOUT);
+                conn.setConnectTimeout(MainActivity.CONNECTION_TIMEOUT);
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-
-                wr.write( data );
+                wr.write(data);
                 wr.flush();
+                conn.connect();
+                int responseCode=conn.getResponseCode();
+                Log.v("mainact","response code="+responseCode);
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 return reader.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
+
+                return "nonet";
             }
-            return null;
         }
         @Override
         protected void onPostExecute(String result) {
             Log.v("teacher",result);
-            pdLoading.dismiss();
-            try
-            {
-                JSONArray ja=new JSONArray(result);
-                JSONObject jo=ja.getJSONObject(0);
-                String msg="";
-                if(jo.has("extra"))
-                {
-                    msg+=jo.getString("extra");
-                    jo=ja.getJSONObject(1);
-                }
-                msg+=jo.getString("message");
-                Toast.makeText(ctx,msg, Toast.LENGTH_LONG).show();
+                pdLoading.dismiss();
+                try {
+                    JSONArray ja = new JSONArray(result);
+                    JSONObject jo = ja.getJSONObject(0);
+                    String msg = "";
+                    if (jo.has("extra")) {
+                        msg += jo.getString("extra");
+                        jo = ja.getJSONObject(1);
+                    }
+                    msg += jo.getString("message");
+                    Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
 
-            }catch (Exception e)
-            {
-                e.printStackTrace();
-                Toast.makeText(ctx,"error while updating please try again after sometime",Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(ctx, "error while updating please try again after sometime", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
 
     }
 }
