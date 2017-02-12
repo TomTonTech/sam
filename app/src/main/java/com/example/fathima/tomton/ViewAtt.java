@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,8 +64,11 @@ public class ViewAtt extends AppCompatActivity {
         avt=(Activity)ctx;
         ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_dropdown_item, sortSS);
         sortS.setAdapter(adapter1);
-        StAysnc stdAysnc=new StAysnc();
-        stdAysnc.execute(name);
+        SqliteSelect ss=new SqliteSelect(ctx);
+        String[] subject = ss.selectSubject();
+        subjectS = (Spinner) findViewById(R.id.spinner_subject);
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
+        subjectS.setAdapter(adapter2);
         btn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -161,10 +165,7 @@ public class ViewAtt extends AppCompatActivity {
                 JSONArray jsonArray=new JSONArray(result);
                 JSONObject j=jsonArray.getJSONObject(0);
                 String subjects = j.getString("subject");
-                String[] subject = subjects.split(",");
-                subjectS = (Spinner) findViewById(R.id.spinner_subject);
-                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
-                subjectS.setAdapter(adapter1);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -207,97 +208,99 @@ public class ViewAtt extends AppCompatActivity {
                 return sb.toString();
             } catch (IOException e) {
                 e.printStackTrace();
+                return "exception";
             }
-            return null;
         }
         @Override
         public void onPostExecute(String result)
         {
             pdLoading.dismiss();
-            JSONObject jsono,teaj;
-            JSONArray jsonArray;
-            listView = (ListView) findViewById(R.id.listView2);
-            try {
-                DecimalFormat df=new DecimalFormat("#.##");
-                jsono=new JSONObject(result);
-                teaj=jsono.getJSONObject("teacher");
-                jsonArray = jsono.getJSONArray("students");
-                String subjectTotal=teaj.getString("total");
-                int len=jsonArray.length();
-                String[] name=new String[len+1];
-                String[] rollno=new String[len+1];
-                String[] count=new String[len+1];
-                String[] perc=new String[len+1];
-                int tot=Integer.parseInt(subjectTotal);
-                if(tot>0)
-                {
-                    int i;
-                    for(i=0;i<len;i++)
-                    {
-                        JSONObject c = jsonArray.getJSONObject(i);
-                        name[i]=c.getString("name");
-                        rollno[i]=c.getString("rollno");
-                        count[i]=c.getString("absent");
-                        int val=Integer.parseInt(count[i]);
-                        int present=tot-val;
-                        count[i]=String.valueOf(present);
-                        double per=((double)present/(double)tot)*100;
-                        perc[i]=df.format(per).concat("%");
-                    }
-                    name[i]="Total";
-                    rollno[i]="";
-                    count[i]=subjectTotal;
-                    perc[i]="100%";
-                    CustomList_View customList = new CustomList_View(avt, name,rollno,count,perc);
-                    tv_error.setVisibility(View.GONE);
-                    llhead.setVisibility(View.VISIBLE);
-                    listView.setVisibility(View.VISIBLE);
-                    listView.setAdapter(customList);
-                    listView.setOnItemClickListener(
-                            new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    final String attname=((TextView)view.findViewById(R.id.attendance_name)).getText().toString();
-                                    final String roll=((TextView)view.findViewById(R.id.attendance_roll)).getText().toString();
-                                    String perc=((TextView)view.findViewById(R.id.attendance_perc)).getText().toString();
-                                    final String divi=rg.getCheckedRadioButtonId()==R.id.radioButton?"a":"b";
-                                    final String subject=subjectS.getSelectedItem().toString();
-                                    String message="\t"+subject+"\nname = "+attname+"\n"+"Roll No ="+roll+"\n"+"Attendance Percentage = "+perc+"\nView Individual Performance";
-                                    new AlertDialog.Builder(ctx)
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .setTitle("Individual Progress")
-                                            .setMessage(message)
-                                            .setPositiveButton("View", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    Intent intent1 = new Intent(ctx, IndividualPro.class);
-                                                    intent1.putExtra("name",attname);
-                                                    intent1.putExtra("roll",roll);
-                                                    intent1.putExtra("division",divi);
-                                                    intent1.putExtra("subject",subject);
-                                                    startActivity(intent1);
-                                                }
-                                            })
-                                            .setNegativeButton("Cancel", null)
-                                            .show();
+            if(result.equalsIgnoreCase("exception"))
+            {
+                Toast.makeText(ctx,"No Internet Connection.Check Connection And Try Again.",Toast.LENGTH_SHORT).show();
+            }
+            else {
+                JSONObject jsono, teaj;
+                JSONArray jsonArray;
+                listView = (ListView) findViewById(R.id.listView2);
+                try {
+                    DecimalFormat df = new DecimalFormat("#.##");
+                    jsono = new JSONObject(result);
+                    teaj = jsono.getJSONObject("teacher");
+                    jsonArray = jsono.getJSONArray("students");
+                    String subjectTotal = teaj.getString("total");
+                    int len = jsonArray.length();
+                    String[] name = new String[len + 1];
+                    String[] rollno = new String[len + 1];
+                    String[] count = new String[len + 1];
+                    String[] perc = new String[len + 1];
+                    int tot = Integer.parseInt(subjectTotal);
+                    if(tot > 0){
+                        int i;
+                        for(i = 0; i < len; i++){
+                            JSONObject c = jsonArray.getJSONObject(i);
+                            name[i] = c.getString("name");
+                            rollno[i] = c.getString("rollno");
+                            count[i] = c.getString("absent");
+                            int val = Integer.parseInt(count[i]);
+                            int present = tot - val;
+                            count[i] = String.valueOf(present);
+                            double per = ((double) present / (double) tot) * 100;
+                            perc[i] = df.format(per).concat("%");
+                        }
+                        name[i] = "Total";
+                        rollno[i] = "";
+                        count[i] = subjectTotal;
+                        perc[i] = "100%";
+                        CustomList_View customList = new CustomList_View(avt, name, rollno, count, perc);
+                        tv_error.setVisibility(View.GONE);
+                        llhead.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.VISIBLE);
+                        listView.setAdapter(customList);
+                        listView.setOnItemClickListener(
+                                new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                        final String attname = ((TextView) view.findViewById(R.id.attendance_name)).getText().toString();
+                                        final String roll = ((TextView) view.findViewById(R.id.attendance_roll)).getText().toString();
+                                        String perc = ((TextView) view.findViewById(R.id.attendance_perc)).getText().toString();
+                                        final String divi = rg.getCheckedRadioButtonId() == R.id.radioButton ? "a" : "b";
+                                        final String subject = subjectS.getSelectedItem().toString();
+                                        String message = "\t" + subject + "\nname = " + attname + "\n" + "Roll No =" + roll + "\n" + "Attendance Percentage = " + perc + "\nView Individual Performance";
+                                        new AlertDialog.Builder(ctx)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setTitle("Individual Progress")
+                                                .setMessage(message)
+                                                .setPositiveButton("View", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent intent1 = new Intent(ctx, IndividualPro.class);
+                                                        intent1.putExtra("name", attname);
+                                                        intent1.putExtra("roll", roll);
+                                                        intent1.putExtra("division", divi);
+                                                        intent1.putExtra("subject", subject);
+                                                        startActivity(intent1);
+                                                    }
+                                                })
+                                                .setNegativeButton("Cancel", null)
+                                                .show();
+                                    }
                                 }
-                            }
-                    );
-                }
-                else
-                {
-                    String err="No Information Available Right Now.";
+                        );
+                    } else {
+                        String err = "No Information Available Right Now.";
+                        tv_error.setVisibility(View.VISIBLE);
+                        llhead.setVisibility(View.GONE);
+                        listView.setVisibility(View.GONE);
+                        tv_error.setText(err);
+                    }
+                } catch (JSONException e) {
+                    String err = "No Information Available";
                     tv_error.setVisibility(View.VISIBLE);
                     llhead.setVisibility(View.GONE);
                     listView.setVisibility(View.GONE);
                     tv_error.setText(err);
                 }
-            } catch (JSONException e) {
-                String err="No Information Available";
-                tv_error.setVisibility(View.VISIBLE);
-                llhead.setVisibility(View.GONE);
-                listView.setVisibility(View.GONE);
-                tv_error.setText(err);
             }
         }
     }

@@ -65,6 +65,7 @@ public class IndividualPro extends AppCompatActivity {
         subjectS=getIntent().getStringExtra("subject");
         rollS=getIntent().getStringExtra("roll");
         divisionS=getIntent().getStringExtra("division");
+        SqliteSelect ss=new SqliteSelect(ctx);
         if(nameS!=null && !nameS.isEmpty())
         {
             Log.v("individual",nameS);
@@ -76,8 +77,22 @@ public class IndividualPro extends AppCompatActivity {
             AsyncIndi i=new AsyncIndi();
             i.execute(nameS,divisionS,subjectS);
         }
-        AsyncSub a=new AsyncSub();
-        a.execute();
+        dropdown1 = (Spinner) findViewById(R.id.spinner_subject);
+        String[] subject = ss.selectSubject();
+        if(subjectS!=null && !subjectS.isEmpty())
+        {
+            for (int i=0;i<subject.length;i++) {
+                if(subject[i].equals(subjectS))
+                {
+                    String temp=subject[0];
+                    subject[0]=subject[i];
+                    subject[i]=temp;
+                    break;
+                }
+            }
+        }
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
+        dropdown1.setAdapter(adapter1);
         btn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -134,38 +149,40 @@ public class IndividualPro extends AppCompatActivity {
                 return bufferedReader.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
+                return "exception";
             }
-            return null;
         }
         @Override
         public void onPostExecute(String result)
         {
             pdLoading.dismiss();
             Log.v("teacher",result);
-            try {
-                JSONArray jsonArray=new JSONArray(result);
-                JSONObject j=jsonArray.getJSONObject(0);
-                Log.v("teacher","json element:"+j);
-                String subjects = j.getString("subject");
-                Log.v("main", subjects);
-                String[] subject = subjects.split(",");
-                if(subjectS!=null && !subjectS.isEmpty())
-                {
-                    for (int i=0;i<subject.length;i++) {
-                        if(subject[i].equals(subjectS))
-                        {
-                            String temp=subject[0];
-                            subject[0]=subject[i];
-                            subject[i]=temp;
-                            break;
+            if(result.equalsIgnoreCase("exception"))
+            {
+                Toast.makeText(ctx,"No Internet Connection.Check Connection And Try Again.",Toast.LENGTH_SHORT).show();
+            }
+            else {
+                try {
+                    JSONArray jsonArray = new JSONArray(result);
+                    JSONObject j = jsonArray.getJSONObject(0);
+                    Log.v("teacher", "json element:" + j);
+                    String subjects = j.getString("subject");
+                    Log.v("main", subjects);
+                    String[] subject = subjects.split(",");
+                    if (subjectS != null && !subjectS.isEmpty()) {
+                        for (int i = 0; i < subject.length; i++) {
+                            if (subject[i].equals(subjectS)) {
+                                String temp = subject[0];
+                                subject[0] = subject[i];
+                                subject[i] = temp;
+                                break;
+                            }
                         }
                     }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                dropdown1 = (Spinner) findViewById(R.id.spinner_subject);
-                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(ctx, R.layout.spinner_layout, subject);
-                dropdown1.setAdapter(adapter1);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -208,45 +225,46 @@ public class IndividualPro extends AppCompatActivity {
                 return bufferedReader.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
+                return "exception";
             }
-            return null;
         }
         @Override
         protected void onPostExecute(String result)
         {
             pdLoading.dismiss();
             Log.v("individual",result);
-            try {
-                listView = (ListView) findViewById(R.id.lv_individual);
-                JSONObject jo=new JSONObject(result);
-                JSONArray ja=jo.getJSONArray("student");
-                date=new String[ja.length()];
-                period=new String[ja.length()];
-                status=new String[ja.length()];
-                for(int i=0;i<ja.length();i++)
-                {
-                    JSONObject njo=ja.getJSONObject(i);
-                    date[i]=njo.getString("date");
-                    period[i]=njo.getString("period");
-                    if(njo.getInt("status")==0)
-                    {
-                        status[i]="absent";
+            if(result.equalsIgnoreCase("exception"))
+            {
+                Toast.makeText(ctx,"No Internet Connection.Check Connection And Try Again.",Toast.LENGTH_SHORT).show();
+            }
+            else {
+                try {
+                    listView = (ListView) findViewById(R.id.lv_individual);
+                    JSONObject jo = new JSONObject(result);
+                    JSONArray ja = jo.getJSONArray("student");
+                    date = new String[ja.length()];
+                    period = new String[ja.length()];
+                    status = new String[ja.length()];
+                    for (int i = 0; i < ja.length(); i++) {
+                        JSONObject njo = ja.getJSONObject(i);
+                        date[i] = njo.getString("date");
+                        period[i] = njo.getString("period");
+                        if (njo.getInt("status") == 0) {
+                            status[i] = "absent";
+                        } else {
+                            status[i] = "present";
+                        }
+                        Log.v("individual", "date:" + date[i] + "\t period:" + period[i] + "\t status:" + status[i]);
                     }
-                    else
-                    {
-                        status[i]="present";
-                    }
-                    Log.v("individual","date:"+date[i]+"\t period:"+period[i]+"\t status:"+status[i]);
+                    ll.setVisibility(LinearLayout.VISIBLE);
+                    CustomList_Individual customList = new CustomList_Individual(avt, date, period, status);
+                    listView.setAdapter(customList);
+                } catch (JSONException e) {
+                    ll.setVisibility(LinearLayout.GONE);
+                    listView.setAdapter(null);
+                    String errorS = "no student named ".concat(nameS).concat(" in the class.try again");
+                    tv.setText(errorS);
                 }
-                ll.setVisibility(LinearLayout.VISIBLE);
-                CustomList_Individual customList = new CustomList_Individual(avt, date,period,status);
-                listView.setAdapter(customList);
-
-            } catch (JSONException e) {
-                ll.setVisibility(LinearLayout.GONE);
-                listView.setAdapter(null);
-                String errorS="no student named ".concat(nameS).concat(" in the class.try again");
-                tv.setText(errorS);
             }
         }
     }

@@ -80,6 +80,10 @@ public class MainWindow extends AppCompatActivity {
                 {
                     new AsyncAtt().execute(String.valueOf(ja));
                 }
+                else
+                {
+                    Toast.makeText(ctx,"EveryThing Is Synced.",Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.action_download:
                 // location found
@@ -198,15 +202,14 @@ public class MainWindow extends AppCompatActivity {
             }
             else
             {
-                if(result.equalsIgnoreCase("same"))
+                if(result.equalsIgnoreCase("somerror"))
                 {
-                    Toast.makeText(ctx,"You Have Already Inserted This data.",Toast.LENGTH_SHORT).show();
-                }else if(result.equalsIgnoreCase("sameperiod"))
-                {
+                    dbh.deleteAttendance();
                     Toast.makeText(ctx,"There Was An Identical Insertion.Check If Your Insertion Is Correct.Successfully inserted data.",Toast.LENGTH_LONG).show();
                 }
                 else if(result.equalsIgnoreCase("success"))
                 {
+                    dbh.deleteAttendance();
                     Toast.makeText(ctx,"Successfully Synced Data.",Toast.LENGTH_SHORT).show();
                 }
                 else

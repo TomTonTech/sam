@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by general on 10/8/2016.
@@ -220,7 +221,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
         String date;
         Date dNow = new Date( );
         SimpleDateFormat ft =
-                new SimpleDateFormat("dd/mm/yyyy");
+                new SimpleDateFormat("d/M/y", Locale.US);
         date=ft.format(dNow);
         Log.v("database","date:"+date);
         String branch="",yearin="",semester="";
@@ -287,6 +288,11 @@ class DatabaseHelper extends SQLiteOpenHelper {
         {
             return null;
         }
+    }
+    Boolean deleteAttendance()
+    {
+        SQLiteDatabase db=this.getWritableDatabase();
+        return db.delete(ATTENDANCE_TABLE,null,null)>0;
     }
     //TODO:Subject details.
     int getSubjectCount()
