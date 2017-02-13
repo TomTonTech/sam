@@ -257,10 +257,10 @@ public class MainWindow extends AppCompatActivity {
                 String result=bufferedReader.readLine();
                 if(result.equalsIgnoreCase("same"))
                     return "same";
-                
+
                 else {
                     try {
-                        URL url1 = new URL("http://192.168.1.100/apk/sam.apk");
+                        URL url1 = new URL("http://tomtontech.in/apk/sam.apk");
                         HttpURLConnection urlConnection = (HttpURLConnection) url1.openConnection();
                         urlConnection.setRequestMethod("GET");
                         urlConnection.setDoOutput(true);
