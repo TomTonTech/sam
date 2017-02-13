@@ -113,6 +113,7 @@ public class ForgotPass extends AppCompatActivity{
                     String line;
                     while ((line = reader.readLine()) != null) {
                         result.append(line);
+                        Log.v("recah","hey"+result);
                     }
                     return(result.toString());
                 }else{
