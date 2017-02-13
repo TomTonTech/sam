@@ -48,12 +48,19 @@ public class ForgotPass extends AppCompatActivity{
         finish();
         return;
     }
-    public void resetPass(View arg0)
+    public void sendCode(View arg0)
     {
+
         final String user= etUsername.getText().toString();
         final String mail= etEmail.getText().toString();
 
         new AsyncReset().execute(user,mail);
+    }
+    public void resetPass(View arg0)
+    {
+        Intent inte=new Intent(context,CheckPassCode.class);
+        startActivity(inte);
+        finish();
 
 
     }
