@@ -56,14 +56,6 @@ public class ForgotPass extends AppCompatActivity{
 
         new AsyncReset().execute(user,mail);
     }
-    public void resetPass(View arg0)
-    {
-        Intent inte=new Intent(context,CheckPassCode.class);
-        startActivity(inte);
-        finish();
-
-
-    }
     private  class AsyncReset extends AsyncTask<String,String,String>
     {
         ProgressDialog pdLoading = new ProgressDialog(ForgotPass.this);
@@ -138,14 +130,14 @@ public class ForgotPass extends AppCompatActivity{
             pdLoading.dismiss();
             if(result.equalsIgnoreCase("unsuccess"))
             {
-                Toast.makeText(context,"Incorrect Username Or Password ",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"User doesnt exist ",Toast.LENGTH_LONG).show();
             }
             else if(result.equalsIgnoreCase("exception")||result.equalsIgnoreCase("unsuccessful")) {
                 Toast.makeText(ForgotPass.this, "OOPs! Something went wrong. Connection Problem.", Toast.LENGTH_LONG).show();
             }else if(result.equalsIgnoreCase("success"))
             {
-                Toast.makeText(context,"Verification Code has been sent to EMail ",Toast.LENGTH_LONG).show();
-                Intent inte=new Intent(context,CheckPassCode.class);
+                Toast.makeText(context,"Password reset instructions has been sent to EMail ",Toast.LENGTH_LONG).show();
+                Intent inte=new Intent(context,MainActivity.class);
                 startActivity(inte);
                 finish();
             }

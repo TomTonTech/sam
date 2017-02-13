@@ -51,8 +51,6 @@
             android:name=".UpdateActivity"
             android:label="@string/title_activity_update" />
         <activity android:name=".ForgotPass" />
-        <activity android:name=".ResetPass" />
-        <activity android:name=".CheckPassCode" />
         <activity android:name=".ContactActivity"></activity>
     </application>
 
