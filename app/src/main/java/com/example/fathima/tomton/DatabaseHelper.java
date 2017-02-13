@@ -13,7 +13,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -218,11 +220,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
         String division=data[2];
         String period=data[3];
         String absent=data[4];
-        String date;
-        Date dNow = new Date( );
-        SimpleDateFormat ft =
-                new SimpleDateFormat("d/M/y", Locale.US);
-        date=ft.format(dNow);
+        String date=data[5];
         Log.v("database","date:"+date);
         String branch="",yearin="",semester="";
         String getSubDetail="SELECT "+DB_BRANCH+","+DB_YEARIN+","+DB_SEMESTER+" FROM "+SUBJECT_TABLE
@@ -387,19 +385,23 @@ class DatabaseHelper extends SQLiteOpenHelper {
     }
     String[] getHodSubject(String branch)
     {
-        String countQuery = "SELECT "+DB_SUBJECTCODE+" FROM " + SUBJECT_TABLE+" WHERE "+DB_BRANCH+"='"+branch+"'";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        String[] subject=new String[cursor.getCount()];
-        int i=0;
-        while(cursor.moveToNext())
-        {
-            subject[i]=cursor.getString(cursor.getColumnIndex("SUBJECTCODE"));
-            i++;
+        List<String> subject = new ArrayList<String>();
+        String[] branches=branch.split(",");
+        int k=0;
+        while(k<branches.length) {
+            String countQuery = "SELECT " + DB_SUBJECTCODE + " FROM " + SUBJECT_TABLE + " WHERE " + DB_BRANCH + "='" + branches[k] + "'";
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery(countQuery, null);
+            while (cursor.moveToNext()) {
+                subject.add(cursor.getString(cursor.getColumnIndex("SUBJECTCODE")));
+            }
+            k++;
+            cursor.close();
         }
-        cursor.close();
-        if(subject.length>0)
-            return subject;
+        if(subject.size()>0) {
+            String[] sSubject=new String[subject.size()];
+            return subject.toArray(sSubject);
+        }
         else
             return null;
     }

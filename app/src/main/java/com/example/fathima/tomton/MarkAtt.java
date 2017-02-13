@@ -33,7 +33,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class MarkAtt extends AppCompatActivity {
     protected Context ctx;
@@ -267,6 +270,11 @@ public class MarkAtt extends AppCompatActivity {
         protected String doInBackground(String... params) {
             String sub = params[0];
             String str=params[1];
+            String date;
+            Date dNow = new Date( );
+            SimpleDateFormat ft =
+                    new SimpleDateFormat("d/M/y", Locale.US);
+            date=ft.format(dNow);
             try {
                 Log.v("hehe","subject"+sub+"\nabsent:"+str);
                 String upUrl=MainActivity.URL_ADDR.concat("update_student_att.php");
@@ -275,6 +283,7 @@ public class MarkAtt extends AppCompatActivity {
                 String data = URLEncoder.encode("subcode", "UTF-8") + "=" + URLEncoder.encode(sub, "UTF-8") + "&"
                         + URLEncoder.encode("status", "UTF-8") + "=" + URLEncoder.encode(str, "UTF-8")+"&"
                         + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8")+"&"
+                        + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(date, "UTF-8")+"&"
                         + URLEncoder.encode("division", "UTF-8") + "=" + URLEncoder.encode(div, "UTF-8")+"&"
                         + URLEncoder.encode("period", "UTF-8") + "=" + URLEncoder.encode(period, "UTF-8");
 
@@ -299,6 +308,7 @@ public class MarkAtt extends AppCompatActivity {
                 data[2]=div;
                 data[3]=period;
                 data[4]=str;
+                data[5]=date;
                 if(dbh.addAttendance(data))
                 {
                     return "success";

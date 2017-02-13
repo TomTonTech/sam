@@ -93,7 +93,6 @@ public class ChangePass extends AppCompatActivity {
             String str_cur=strings[0];
             String str_new=strings[1];
             String str_user=strings[2];
-            Log.v("cpass","user="+str_user+"\nnew password="+str_new+"\ncurrentpasswrd="+str_cur);
             HttpURLConnection conn;
             URL url;
             String url_S;

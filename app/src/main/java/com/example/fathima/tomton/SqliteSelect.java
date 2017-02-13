@@ -34,8 +34,7 @@ class SqliteSelect {
         }
         if(priority==1)
         {
-            if(designation.equalsIgnoreCase("HOD"))
-            {
+            if (designation.equalsIgnoreCase("HOD")) {
                 return dbh.getHodSubject(branch);
             }
         }
