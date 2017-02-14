@@ -1,6 +1,7 @@
 package com.example.fathima.tomton;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -232,9 +234,20 @@ public class MainWindow extends AppCompatActivity {
             }
         }
     }
-    public class AsyncApp extends AsyncTask<String,Void,String>
+    public class AsyncApp extends AsyncTask<String,String,String>
     {
-
+        ProgressDialog pdLoading = new ProgressDialog(ctx);
+        @Override
+        protected void onPreExecute()
+        {
+            pdLoading.setMessage("Checking For Update");
+            pdLoading.setCancelable(false);
+            pdLoading.setProgress(0);
+            pdLoading.show();
+        }
+        protected void onProgressUpdate(String... progress) {
+            pdLoading.setMessage(progress[0]);
+        }
         @Override
         protected String doInBackground(String...strings) {
             String data=strings[0];
@@ -257,16 +270,17 @@ public class MainWindow extends AppCompatActivity {
                 String result=bufferedReader.readLine();
                 if(result.equalsIgnoreCase("same"))
                     return "same";
-
                 else {
+                    publishProgress("Downloading App");
                     try {
-                        URL url1 = new URL("http://tomtontech.in/apk/sam.apk");
+                        String surl=MainActivity.APK_ADDR.concat("sam.apk");
+                        URL url1 = new URL(surl);
                         HttpURLConnection urlConnection = (HttpURLConnection) url1.openConnection();
                         urlConnection.setRequestMethod("GET");
                         urlConnection.setDoOutput(true);
                         urlConnection.connect();
                         File sdcard = Environment.getExternalStorageDirectory();
-                        File file = new File(sdcard, "sama.apk");
+                        File file = new File(sdcard, "sam_"+result+".apk");
                         FileOutputStream fileOutput = new FileOutputStream(file);
                         InputStream inputStream1 = urlConnection.getInputStream();
                         byte[] buffer = new byte[1024];
@@ -294,6 +308,7 @@ public class MainWindow extends AppCompatActivity {
         @Override
         public void onPostExecute(String result)
         {
+            pdLoading.dismiss();
             if(result.equalsIgnoreCase("exception"))
             {
                 Toast.makeText(ctx,"No Internet Connection. Check Connection And Try Again Later.",Toast.LENGTH_SHORT).show();
@@ -307,40 +322,17 @@ public class MainWindow extends AppCompatActivity {
                 }
                 else
                 {
-                    Toast.makeText(ctx,"Something Went Wrong.Contact App Developer.",Toast.LENGTH_SHORT).show();
-                    installApk();
+                    Toast.makeText(ctx,"Downloaded App Successfully",Toast.LENGTH_SHORT).show();
+                    installApk(result);
                 }
             }
         }
     }
-    private void downloadapk(){
-        try {
-            URL url = new URL("http://tomtontech.in/apk/sam.apk");
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            urlConnection.connect();
-            File sdcard = Environment.getExternalStorageDirectory();
-            File file = new File(sdcard, "sam.apk");
-            FileOutputStream fileOutput = new FileOutputStream(file);
-            InputStream inputStream = urlConnection.getInputStream();
-            byte[] buffer = new byte[1024];
-            int bufferLength = 0;
-
-            while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
-                fileOutput.write(buffer, 0, bufferLength);
-            }
-            fileOutput.close();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void installApk(){
+    private void installApk(String version){
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(new File("/sdcard/sama.apk"));
+        File sdcard = Environment.getExternalStorageDirectory();
+        String filestr="sam_".concat(version).concat(".apk");
+        Uri uri = Uri.fromFile(new File(sdcard,filestr));
         intent.setDataAndType(uri, "application/vnd.android.package-archive");
         startActivity(intent);
     }
