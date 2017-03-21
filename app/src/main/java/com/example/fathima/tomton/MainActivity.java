@@ -28,7 +28,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     // CONNECTION_TIMEOUT and READ_TIMEOUT are in milliseconds
-    public static final String URL_ADDR="http://192.168.1.100/android/";
+    public static final String URL_ADDR="http://10.0.2.2/android1/";
     public static final String APK_ADDR="http://192.168.1.100/apk/";
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
