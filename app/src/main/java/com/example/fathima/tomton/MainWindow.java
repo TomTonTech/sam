@@ -47,7 +47,12 @@ public class MainWindow extends AppCompatActivity {
         int prio=sp.getInt("priority",0);
         rlassign=(RelativeLayout)findViewById(R.id.rlassign);
         rlupdate=(RelativeLayout)findViewById(R.id.rlupdate);
-        if(prio==1)
+        if(prio==0)
+        {
+            rlupdate.setVisibility(View.GONE);
+            rlassign.setVisibility(View.VISIBLE);
+        }
+        else if(prio==1||prio==4)
         {
             rlupdate.setVisibility(View.GONE);
             rlassign.setVisibility(View.VISIBLE);
@@ -142,6 +147,11 @@ public class MainWindow extends AppCompatActivity {
     public void indiFunction(View view)
     {
         Intent i=new Intent(ctx,IndividualPro.class);
+        startActivity(i);
+    }
+    public void assignFunction(View view)
+    {
+        Intent i=new Intent(ctx,AssignActivity.class);
         startActivity(i);
     }
     public void messageFunction(View view)

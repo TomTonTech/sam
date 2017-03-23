@@ -38,6 +38,13 @@ class SqliteSelect {
                 return dbh.getHodSubject(branch);
             }
         }
+        if(priority==4)
+        {
+            if(designation.equalsIgnoreCase("PRINCIPAL"))
+            {
+                return  dbh.getAllSubject();
+            }
+        }
         return null;
     }
 

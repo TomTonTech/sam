@@ -405,4 +405,21 @@ class DatabaseHelper extends SQLiteOpenHelper {
         else
             return null;
     }
+    String[] getAllSubject()
+    {
+        List<String> subject = new ArrayList<String>();
+        String countQuery = "SELECT " + DB_SUBJECTCODE + " FROM " + SUBJECT_TABLE ;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        while (cursor.moveToNext()) {
+            subject.add(cursor.getString(cursor.getColumnIndex("SUBJECTCODE")));
+        }
+            cursor.close();
+        if(subject.size()>0) {
+            String[] sSubject=new String[subject.size()];
+            return subject.toArray(sSubject);
+        }
+        else
+            return null;
+    }
 }
